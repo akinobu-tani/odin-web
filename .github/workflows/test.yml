@@ -23,6 +23,11 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npm run test:ci
+      - uses: EnricoMi/publish-unit-test-result-action@v1.6
+        if: always()
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            files: test-results/**/*.xml
       - uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
