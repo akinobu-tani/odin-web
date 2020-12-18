@@ -1,16 +1,10 @@
-import { AppPage } from './app.po';
-import { browser, logging } from 'protractor';
+import {browser, by, element, logging} from 'protractor';
 
-describe('workspace-project App', () => {
-  let page: AppPage;
+describe('Odin App', () => {
 
-  beforeEach(() => {
-    page = new AppPage();
-  });
-
-  it('should display welcome message', async () => {
-    await page.navigateTo();
-    expect(await page.getTitleText()).toEqual('odin-app app is running!');
+  it('should display top page', async () => {
+    await browser.get(browser.baseUrl);
+    expect(await element(by.css('.header__site-name')).getText()).toEqual('Odin');
   });
 
   afterEach(async () => {
