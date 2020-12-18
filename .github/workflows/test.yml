@@ -18,6 +18,6 @@ jobs:
           node-version: '12.x'
       - run: npm install
       - run: npm run build
-      - run: npm test
+      - run: npm run test:ci
       - run: npm run lint
-      - run: npm run e2e
+      - run: npm run e2e:ci
