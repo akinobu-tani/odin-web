@@ -1,0 +1,58 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  SLACK_USERNAME: GitHub Actions
+  SLACK_ICON: https://res.cloudinary.com/dkxeqkwss/image/upload/v1596961487/GitHub-Mark-120px-plus_n44eba.png
+  SLACK_MESSAGE: ${{ github.event.head_commit.message || github.event.pull_request.title }}
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: node-${{ hashFiles('**/package-lock.json') }}
+      - run: npm install
+
+      - run: npm run build
+
+      - run: npm run test:ci
+
+      - uses: EnricoMi/publish-unit-test-result-action@v1.6
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: test-results/**/*.xml
+
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - run: npm run lint
+      - run: npm run e2e:ci
+
+      - uses: rtCamp/action-slack-notify@v2.1.0
+        env:
+          SLACK_COLOR: good
+          SLACK_TITLE: Success
+        if: ${{ success() }}
+      - uses: rtCamp/action-slack-notify@v2.1.0
+        env:
+          SLACK_COLOR: danger
+          SLACK_TITLE: Failure
+        if: ${{ failure() }}
